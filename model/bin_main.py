@@ -58,9 +58,7 @@ def training(args):
         epoch_end_time  = time.time()
         
         tot_train_time.append(epoch_end_time-epoch_start_time)
-        
-        # print(f"train spk count {(train_infos['class_spike_count'][0]+train_infos['class_spike_count'][1])/25000}")
-        
+ 
         scheduler.step()
         
         epoch_start_time = time.time()
@@ -70,9 +68,6 @@ def training(args):
         epoch_end_time = time.time()
         
         tot_val_time.append(epoch_end_time-epoch_start_time)
-        
-        # print(f"test spk count {(val_infos['t_class_spike_count'][0] + val_infos['t_class_spike_count'][1])/5000}")
-        
 
         # save epoch info
         epoch_infos = epoch_info(args.num_classes, train_infos, val_infos)
@@ -85,96 +80,6 @@ def training(args):
     
     # final model information       
     save_info(model.state_dict(), args, epoch_infos)
-
-    
-# def test(**kargs):
-#     ''' 
-#     Test method for visualization and checking results
-#     ---
-#     - args : arguments,
-#     - model_root : already trained model state dict,
-#     - show_frame : if you want to check data details 
-    
-#     if you want to test model for data set, we need:  
-#         - need_loader=True,
-#         - data_root : csv file root, 
-        
-#     else:  
-#         - need_loader=False,
-#         - sample : one sample of data(A returned tensor of dataset class)
-        
-#     '''
-    
-#     args = kargs['args']
-#     model_root = kargs['model_root']
-#     need_loader = kargs['need_loader']
-#     show_frame = kargs['show_frame'] if kargs['show_frame'] else None
-    
-#     trained_model_info = torch.load(model_root, map_location=args.device)
-    
-#     model = MODEL[args.model_name](args).to(args.device)
-#     model.load_state_dict(trained_model_info['model_state'])
-    
-#     if need_loader:
-#         data_root = kargs['data_root']
-        
-#         test_set = CustomDataset(data_root, class_imbalance=False, transform=None)
-#         test_loader = torch.utils.data.DataLoader(test_set, batchsize=1, shuffle=False)
-        
-#         with torch.no_grad():
-#             model.eval()
-#             for img, label in test_loader:
-                
-#                 img = img.to(args.device)
-#                 label = label.to(args.device)
-                
-#                 spk_rec, _ = model(img)
-                
-#                 _, predicted_class = spk_rec.sum(dim=0).max(1)
-        
-#                 for i in range(len(predicted_class)): print(f"Model predict {predicted_class[i]} (target class : {label[i]})")
-        
-#     else:
-#         sample = kargs['sample']
-
-#         X = sample[0]; y = sample[1]
-        
-#         if show_frame: show_data_frame(X, y)
-        
-#         with torch.no_grad():
-#             model.eval()
-            
-#             X = X.to(args.device)
-#             y = y.to(args.device)
-            
-#             spk_rec, _ = model(X)
-            
-#             _, predicted_class = spk_rec.sum(0).max(1)
-            
-#             plot_data(X.cpu().numpy().squeeze(0), predicted_class, y)
-
-
-def test(args):
-    data_root = args.test_data_root
-    
-    test_set = CustomDataset(data_root, class_imbalance=True, transform=None)
-    test_loader = torch.utils.data.DataLoader(test_set, batchsize=1, shuffle=False)
-    
-    args.data_num_steps = test_set[1][0].shape[0]
-    
-    model_root = args.model_root
-    
-    trained_model_info = torch.load(model_root, map_location=args.device)
-    
-    model = MODEL[args.model_name](args).to(args.device)
-    model.load_state_dict(trained_model_info['model_state'])
-
-    
-    criterion = args.criterion()
-    
-    test_info = val(args, model, test_loader, criterion)
-        
-    
     
 
 if __name__ == '__main__':
