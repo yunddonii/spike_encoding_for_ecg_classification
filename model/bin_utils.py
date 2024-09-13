@@ -359,7 +359,6 @@ def save_info(model, args, epoch_infos):
 
     
 def epoch_print_save(args, epoch, epoch_infos, optimizer_param, model_state_dict=None):
-    # optimizer.param_groups[0]['lr']
     
     if (epoch+1) % args.print_epoch == 0:
         
@@ -374,7 +373,7 @@ def epoch_print_save(args, epoch, epoch_infos, optimizer_param, model_state_dict
         print(f"\n++ sheduler lerning rate : {optimizer_param}\n")
         
 
-def epoch_info(num_classes, train_infos, val_infos):
+def epoch_info(num_classes:int, train_infos:dict, val_infos:dict):
     
     epoch_infos = {
         'epoch_loss' : list(),
@@ -412,9 +411,10 @@ def epoch_info(num_classes, train_infos, val_infos):
 
 def plot_data(data, predicted_class, target_class):
     
-    if type(predicted_class) == torch.Tensor:
+    if isinstance(predicted_class, torch.Tensor):
         predicted_class = predicted_class.item()
-    if type(target_class) == torch.Tensor:
+
+    if isinstance(target_class, torch.Tensor):
         target_class = target_class.item()
     
     class_dict = {0: 'normal',
@@ -439,12 +439,12 @@ def show_data_frame(data, target):
     print(sample)
 
     
-def get_one_sample(root, random=True, **kargrs):
+def get_one_sample(root, random=True, **kargs):
     test_set = CustomDataset(root, True, None)
     if random:
         idx = np.random.randint(low=0, high=len(test_set), size=(1,))
     else:
-        idx = kargrs['idx']
+        idx = kargs['idx']
         
     return idx, (test_set[idx][0], test_set[idx][1])
 
